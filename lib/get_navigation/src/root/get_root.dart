@@ -13,7 +13,6 @@ class ConfigData {
   final bool? enableLog;
   final LogWriterCallback? logWriterCallback;
   final SmartManagement smartManagement;
-  final List<Bind> binds;
   final Duration? transitionDuration;
   final bool? defaultGlobalState;
   final List<GetPage>? getPages;
@@ -26,7 +25,6 @@ class ConfigData {
   final GlobalKey<NavigatorState>? navigatorKey;
   final GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey;
   final Map<String, Map<String, String>>? translationsKeys;
-  final Translations? translations;
   final Locale? locale;
   final Locale? fallbackLocale;
   final String? initialRoute;
@@ -55,7 +53,6 @@ class ConfigData {
     required this.enableLog,
     required this.logWriterCallback,
     required this.smartManagement,
-    required this.binds,
     required this.transitionDuration,
     required this.defaultGlobalState,
     required this.getPages,
@@ -68,7 +65,6 @@ class ConfigData {
     required this.navigatorKey,
     required this.scaffoldMessengerKey,
     required this.translationsKeys,
-    required this.translations,
     required this.locale,
     required this.fallbackLocale,
     required this.initialRoute,
@@ -87,7 +83,7 @@ class ConfigData {
     this.parameters = const {},
     Routing? routing,
     bool? defaultPopGesture,
-  })  : defaultPopGesture = defaultPopGesture ?? GetPlatform.isIOS,
+  })  : defaultPopGesture = defaultPopGesture ?? true,
         routing = routing ?? Routing();
 
   ConfigData copyWith({
@@ -99,7 +95,6 @@ class ConfigData {
     bool? enableLog,
     LogWriterCallback? logWriterCallback,
     SmartManagement? smartManagement,
-    List<Bind>? binds,
     Duration? transitionDuration,
     bool? defaultGlobalState,
     List<GetPage>? getPages,
@@ -112,7 +107,6 @@ class ConfigData {
     GlobalKey<NavigatorState>? navigatorKey,
     GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     Map<String, Map<String, String>>? translationsKeys,
-    Translations? translations,
     Locale? locale,
     Locale? fallbackLocale,
     String? initialRoute,
@@ -141,7 +135,6 @@ class ConfigData {
       enableLog: enableLog ?? this.enableLog,
       logWriterCallback: logWriterCallback ?? this.logWriterCallback,
       smartManagement: smartManagement ?? this.smartManagement,
-      binds: binds ?? this.binds,
       transitionDuration: transitionDuration ?? this.transitionDuration,
       defaultGlobalState: defaultGlobalState ?? this.defaultGlobalState,
       getPages: getPages ?? this.getPages,
@@ -156,7 +149,6 @@ class ConfigData {
       navigatorKey: navigatorKey ?? this.navigatorKey,
       scaffoldMessengerKey: scaffoldMessengerKey ?? this.scaffoldMessengerKey,
       translationsKeys: translationsKeys ?? this.translationsKeys,
-      translations: translations ?? this.translations,
       locale: locale ?? this.locale,
       fallbackLocale: fallbackLocale ?? this.fallbackLocale,
       initialRoute: initialRoute ?? this.initialRoute,
@@ -195,7 +187,6 @@ class ConfigData {
         other.enableLog == enableLog &&
         other.logWriterCallback == logWriterCallback &&
         other.smartManagement == smartManagement &&
-        listEquals(other.binds, binds) &&
         other.transitionDuration == transitionDuration &&
         other.defaultGlobalState == defaultGlobalState &&
         listEquals(other.getPages, getPages) &&
@@ -208,7 +199,6 @@ class ConfigData {
         other.navigatorKey == navigatorKey &&
         other.scaffoldMessengerKey == scaffoldMessengerKey &&
         mapEquals(other.translationsKeys, translationsKeys) &&
-        other.translations == translations &&
         other.locale == locale &&
         other.fallbackLocale == fallbackLocale &&
         other.initialRoute == initialRoute &&
@@ -240,7 +230,6 @@ class ConfigData {
         enableLog.hashCode ^
         logWriterCallback.hashCode ^
         smartManagement.hashCode ^
-        binds.hashCode ^
         transitionDuration.hashCode ^
         defaultGlobalState.hashCode ^
         getPages.hashCode ^
@@ -253,7 +242,6 @@ class ConfigData {
         navigatorKey.hashCode ^
         scaffoldMessengerKey.hashCode ^
         translationsKeys.hashCode ^
-        translations.hashCode ^
         locale.hashCode ^
         fallbackLocale.hashCode ^
         initialRoute.hashCode ^
@@ -277,10 +265,10 @@ class ConfigData {
 
 class GetRoot extends StatefulWidget {
   const GetRoot({
-    Key? key,
+    super.key,
     required this.config,
     required this.child,
-  }) : super(key: key);
+  });
   final ConfigData config;
   final Widget child;
   @override
@@ -339,7 +327,6 @@ class GetRootState extends State<GetRoot> with WidgetsBindingObserver {
 
   void onClose() {
     config.onDispose?.call();
-    Get.clearTranslations();
     RouterReportManager.instance.clearRouteKeys();
     RouterReportManager.dispose();
     Get.resetInstance(clearRouteBindings: true);
@@ -393,18 +380,6 @@ class GetRootState extends State<GetRoot> with WidgetsBindingObserver {
           config.copyWith(routeInformationParser: newRouteInformationParser);
     }
 
-    if (config.locale != null) Get.locale = config.locale;
-
-    if (config.fallbackLocale != null) {
-      Get.fallbackLocale = config.fallbackLocale;
-    }
-
-    if (config.translations != null) {
-      Get.addTranslations(config.translations!.keys);
-    } else if (config.translationsKeys != null) {
-      Get.addTranslations(config.translationsKeys!);
-    }
-
     Get.smartManagement = config.smartManagement;
     config.onInit?.call();
 
@@ -456,14 +431,7 @@ class GetRootState extends State<GetRoot> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeLocales(List<Locale>? locales) {
-    Get.asap(() {
-      final locale = Get.deviceLocale;
-      if (locale != null) {
-        Get.updateLocale(locale);
-      }
-    });
-  }
+  void didChangeLocales(List<Locale>? locales) {}
 
   void setTheme(ThemeData value) {
     if (config.darkTheme == null) {

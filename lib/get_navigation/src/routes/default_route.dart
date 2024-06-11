@@ -54,7 +54,6 @@ class GetPageRoute<T> extends PageRoute<T>
     this.barrierColor,
     BindingsInterface? binding,
     List<BindingsInterface> bindings = const [],
-    this.binds,
     this.routeName,
     this.page,
     this.title,
@@ -80,7 +79,6 @@ class GetPageRoute<T> extends PageRoute<T>
   final CustomTransition? customTransition;
   final List<BindingsInterface> bindings;
   final Map<String, String>? parameter;
-  final List<Bind>? binds;
 
   @override
   final bool showCupertinoParallax;
@@ -119,31 +117,7 @@ class GetPageRoute<T> extends PageRoute<T>
     if (_child != null) return _child!;
     final middlewareRunner = MiddlewareRunner(middlewares);
 
-    final localbinds = [if (binds != null) ...binds!];
-
-    final bindingsToBind = middlewareRunner
-        .runOnBindingsStart(bindings.isNotEmpty ? bindings : localbinds);
-
     final pageToBuild = middlewareRunner.runOnPageBuildStart(page)!;
-
-    if (bindingsToBind != null && bindingsToBind.isNotEmpty) {
-      if (bindingsToBind is List<BindingsInterface>) {
-        for (final item in bindingsToBind) {
-          final dep = item.dependencies();
-          if (dep is List<Bind>) {
-            _child = Binds(
-              binds: dep,
-              child: middlewareRunner.runOnPageBuilt(pageToBuild()),
-            );
-          }
-        }
-      } else if (bindingsToBind is List<Bind>) {
-        _child = Binds(
-          binds: bindingsToBind,
-          child: middlewareRunner.runOnPageBuilt(pageToBuild()),
-        );
-      }
-    }
 
     return _child ??= middlewareRunner.runOnPageBuilt(pageToBuild());
   }

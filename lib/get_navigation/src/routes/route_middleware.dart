@@ -216,7 +216,6 @@ class PageRedirect {
       customTransition: r.customTransition,
       bindings: r.bindings,
       binding: r.binding,
-      binds: r.binds,
       transitionDuration: r.transitionDuration ?? Get.defaultTransitionDuration,
       reverseTransitionDuration:
           r.reverseTransitionDuration ?? Get.defaultTransitionDuration,

@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../get_instance/src/bindings_interface.dart';
-import '../../../get_utils/src/platform/platform.dart';
 import '../../../route_manager.dart';
 
 class GetDelegate extends RouterDelegate<RouteDecoder>
@@ -97,7 +96,7 @@ class GetDelegate extends RouterDelegate<RouteDecoder>
             body: Center(child: Text('Route not found')),
           ),
         ) {
-    if (!showHashOnUrl && GetPlatform.isWeb) setUrlStrategy();
+    if (!showHashOnUrl && kIsWeb) setUrlStrategy();
     addPages(pages);
     addPage(notFoundRoute);
     Get.log('GetDelegate is created !');

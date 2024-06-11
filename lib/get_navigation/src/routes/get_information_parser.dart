@@ -34,7 +34,7 @@ class GetInformationParser extends RouteInformationParser<RouteDecoder> {
 
     Get.log('GetInformationParser: route location: $location');
 
-    final routeName = location ?? initialRoute;
+    final routeName = location;
 
     return SynchronousFuture(RouteDecoder.fromRoute(routeName));
   }

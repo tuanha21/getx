@@ -194,40 +194,20 @@ class ParseRouteTree {
         if (route.bindings.isNotEmpty) ...route.bindings
       ];
 
-      final parentBinds = [
-        if (page.binds.isNotEmpty) ...page.binds,
-        if (route.binds.isNotEmpty) ...route.binds
-      ];
-
       result.add(
-        _addChild(
-          page,
-          parentPath,
-          parentMiddlewares,
-          parentBindings,
-          parentBinds,
-        ),
+        _addChild(page, parentPath, parentMiddlewares, parentBindings),
       );
 
       final children = _flattenPage(page);
       for (var child in children) {
-        result.add(_addChild(
-          child,
-          parentPath,
-          [
-            ...parentMiddlewares,
-            if (child.middlewares.isNotEmpty) ...child.middlewares,
-          ],
-          [
-            ...parentBindings,
-            if (child.binding != null) child.binding!,
-            if (child.bindings.isNotEmpty) ...child.bindings,
-          ],
-          [
-            ...parentBinds,
-            if (child.binds.isNotEmpty) ...child.binds,
-          ],
-        ));
+        result.add(_addChild(child, parentPath, [
+          ...parentMiddlewares,
+          if (child.middlewares.isNotEmpty) ...child.middlewares,
+        ], [
+          ...parentBindings,
+          if (child.binding != null) child.binding!,
+          if (child.bindings.isNotEmpty) ...child.bindings,
+        ]));
       }
     }
     return result;
@@ -239,7 +219,6 @@ class ParseRouteTree {
     String parentPath,
     List<GetMiddleware> middlewares,
     List<BindingsInterface> bindings,
-    List<Bind> binds,
   ) {
     return origin.copyWith(
       middlewares: middlewares,
@@ -247,7 +226,6 @@ class ParseRouteTree {
           ? (parentPath + origin.name).replaceAll(r'//', '/')
           : origin.name,
       bindings: bindings,
-      binds: binds,
       // key:
     );
   }

@@ -1044,7 +1044,6 @@ extension GetNavigationExt on GetInterface {
   // }
 
   Future<void> updateLocale(Locale l) async {
-    Get.locale = l;
     await forceAppUpdate();
   }
 
