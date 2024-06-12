@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:snack_bar/get_utils/get_utils.dart';
 
 import '../../../get.dart';
 
@@ -47,9 +48,9 @@ class SnackbarController {
   Future<void> get future => _transitionCompleter.future;
 
   /// Close the snackbar with animation
-  Future<void> close({bool withAnimations = true}) async {
+  Future<void> close(BuildContext context, {bool withAnimations = true}) async {
     if (!withAnimations) {
-      _removeOverlay();
+      _removeOverlay(context);
       return;
     }
     _removeEntry();
@@ -59,8 +60,8 @@ class SnackbarController {
   /// Adds GetSnackbar to a view queue.
   /// Only one GetSnackbar will be displayed at a time, and this method returns
   /// a future to when the snackbar disappears.
-  Future<void> show() {
-    return _snackBarQueue._addJob(this);
+  Future<void> show(BuildContext context) {
+    return _snackBarQueue._addJob(context, this);
   }
 
   void _cancelTimer() {
@@ -87,23 +88,15 @@ class SnackbarController {
     }
   }
 
-  bool _isTesting = false;
-
-  void _configureOverlay() {
-    final overlayContext = Get.overlayContext;
-    _isTesting = overlayContext == null;
-    _overlayState =
-        _isTesting ? OverlayState() : Overlay.of(Get.overlayContext!);
+  void _configureOverlay(BuildContext context) {
+    _overlayState = Overlay.of(context);
     _overlayEntries.clear();
     _overlayEntries.addAll(_createOverlayEntries(_getBodyWidget()));
-    if (!_isTesting) {
-      _overlayState!.insertAll(_overlayEntries);
-    }
 
-    _configureSnackBarDisplay();
+    _configureSnackBarDisplay(context);
   }
 
-  void _configureSnackBarDisplay() {
+  void _configureSnackBarDisplay(BuildContext context) {
     assert(!_transitionCompleter.isCompleted,
         'Cannot configure a snackbar after disposing it.');
     _controller = _createAnimationController();
@@ -112,7 +105,8 @@ class SnackbarController {
     _filterBlurAnimation = _createBlurFilterAnimation();
     _filterColorAnimation = _createColorOverlayColor();
     _animation = _createAnimation();
-    _animation.addStatusListener(_handleStatusChanged);
+    _animation
+        .addStatusListener((status) => _handleStatusChanged(context, status));
     _configureTimer();
     _controller.forward();
   }
@@ -195,7 +189,7 @@ class SnackbarController {
             onTap: () {
               if (snackbar.isDismissible && !_onTappedDismiss) {
                 _onTappedDismiss = true;
-                close();
+                close(context);
               }
             },
             child: AnimatedBuilder(
@@ -239,7 +233,8 @@ class SnackbarController {
   Widget _getBodyWidget() {
     return Builder(builder: (_) {
       return MouseRegion(
-        onEnter: (_) => snackbar.onHover?.call(snackbar, SnackHoverState.entered),
+        onEnter: (_) =>
+            snackbar.onHover?.call(snackbar, SnackHoverState.entered),
         onExit: (_) => snackbar.onHover?.call(snackbar, SnackHoverState.exited),
         child: GestureDetector(
           onTap: snackbar.onTap != null
@@ -285,7 +280,7 @@ class SnackbarController {
     );
   }
 
-  void _handleStatusChanged(AnimationStatus status) {
+  void _handleStatusChanged(BuildContext context, AnimationStatus status) {
     switch (status) {
       case AnimationStatus.completed:
         _currentStatus = SnackbarStatus.open;
@@ -306,7 +301,7 @@ class SnackbarController {
         assert(!_overlayEntries.first.opaque);
         _currentStatus = SnackbarStatus.closed;
         _snackbarStatus?.call(_currentStatus);
-        _removeOverlay();
+        _removeOverlay(context);
         break;
     }
   }
@@ -327,13 +322,7 @@ class SnackbarController {
     }
   }
 
-  void _removeOverlay() {
-    if (!_isTesting) {
-      for (var element in _overlayEntries) {
-        element.remove();
-      }
-    }
-
+  void _removeOverlay(BuildContext context) {
     assert(!_transitionCompleter.isCompleted,
         'Cannot remove overlay from a disposed snackbar');
     _controller.dispose();
@@ -341,17 +330,17 @@ class SnackbarController {
     _transitionCompleter.complete();
   }
 
-  Future<void> _show() {
-    _configureOverlay();
+  Future<void> _show(BuildContext context) {
+    _configureOverlay(context);
     return future;
   }
 
-  static void cancelAllSnackbars() {
-    _snackBarQueue._cancelAllJobs();
+  static void cancelAllSnackbars(BuildContext context) {
+    _snackBarQueue._cancelAllJobs(context);
   }
 
-  static Future<void> closeCurrentSnackbar() async {
-    await _snackBarQueue._closeCurrentJob();
+  static Future<void> closeCurrentSnackbar(BuildContext context) async {
+    await _snackBarQueue._closeCurrentJob(context);
   }
 }
 
@@ -366,21 +355,21 @@ class _SnackBarQueue {
 
   bool get _isJobInProgress => _snackbarList.isNotEmpty;
 
-  Future<void> _addJob(SnackbarController job) async {
+  Future<void> _addJob(BuildContext context, SnackbarController job) async {
     _snackbarList.add(job);
     final data = await _queue.add(job._show);
     _snackbarList.remove(job);
     return data;
   }
 
-  Future<void> _cancelAllJobs() async {
-    await _currentSnackbar?.close();
+  Future<void> _cancelAllJobs(BuildContext context) async {
+    await _currentSnackbar?.close(context);
     _queue.cancelAllJobs();
     _snackbarList.clear();
   }
 
-  Future<void> _closeCurrentJob() async {
+  Future<void> _closeCurrentJob(BuildContext context) async {
     if (_currentSnackbar == null) return;
-    await _currentSnackbar!.close();
+    await _currentSnackbar!.close(context);
   }
 }

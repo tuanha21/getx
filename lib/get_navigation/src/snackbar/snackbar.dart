@@ -7,7 +7,8 @@ import '../../../get_core/get_core.dart';
 import '../../get_navigation.dart';
 
 typedef OnTap = void Function(GetSnackBar snack);
-typedef OnHover = void Function(GetSnackBar snack, SnackHoverState snackHoverState);
+typedef OnHover = void Function(
+    GetSnackBar snack, SnackHoverState snackHoverState);
 
 typedef SnackbarStatusCallback = void Function(SnackbarStatus? status);
 
@@ -165,7 +166,7 @@ class GetSnackBar extends StatefulWidget {
   final Form? userInputForm;
 
   const GetSnackBar({
-    Key? key,
+    super.key,
     this.title,
     this.message,
     this.titleText,
@@ -202,15 +203,15 @@ class GetSnackBar extends StatefulWidget {
     this.overlayColor = Colors.transparent,
     this.userInputForm,
     this.snackbarStatus,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => GetSnackBarState();
 
   /// Show the snack. It's call [SnackbarStatus.OPENING] state
   /// followed by [SnackbarStatus.OPEN]
-  SnackbarController show() {
-    return Get.showSnackbar(this);
+  SnackbarController show(BuildContext context) {
+    return Get.showSnackbar(context, this);
   }
 }
 

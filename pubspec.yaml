@@ -1,5 +1,5 @@
-name: get
-description: Open screens/snackbars/dialogs without context, manage states and inject dependencies easily with GetX.
+name: snack_bar
+description: Open snackbars.
 version: 5.0.0-release-candidate-4
 homepage: https://github.com/jonataslaw/getx
 
