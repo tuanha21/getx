@@ -2,9 +2,9 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:snack_bar/get_core/get_core.dart';
+import 'package:get_snack_bar/get_core/get_core.dart';
 
-import '../../get.dart';
+import '../../get_snack_bar.dart';
 
 extension ExtensionSnackbar on GetInterface {
   SnackbarController rawSnackbar(
@@ -46,7 +46,7 @@ extension ExtensionSnackbar on GetInterface {
     Color? overlayColor,
     Form? userInputForm,
   }) {
-    final getSnackBar = GetSnackBar(
+    final getSnackBar = SSSnackBar(
       snackbarStatus: snackbarStatus,
       title: title,
       message: message,
@@ -96,7 +96,7 @@ extension ExtensionSnackbar on GetInterface {
     return controller;
   }
 
-  SnackbarController showSnackbar(BuildContext context, GetSnackBar snackbar) {
+  SnackbarController showSnackbar(BuildContext context, SSSnackBar snackbar) {
     final controller = SnackbarController(snackbar);
     controller.show(context);
     return controller;
@@ -124,6 +124,8 @@ extension ExtensionSnackbar on GetInterface {
     double? borderWidth,
     Color? backgroundColor,
     Color? leftBarIndicatorColor,
+    Color? bottomBarIndicatorColor,
+    double? bottomBarIndicatorHeight,
     List<BoxShadow>? boxShadows,
     Gradient? backgroundGradient,
     TextButton? mainButton,
@@ -145,7 +147,7 @@ extension ExtensionSnackbar on GetInterface {
     Color? overlayColor,
     Form? userInputForm,
   }) {
-    final getSnackBar = GetSnackBar(
+    final getSnackBar = SSSnackBar(
         snackbarStatus: snackbarStatus,
         titleText: titleText ??
             Text(
@@ -182,6 +184,8 @@ extension ExtensionSnackbar on GetInterface {
         borderColor: borderColor,
         borderWidth: borderWidth,
         leftBarIndicatorColor: leftBarIndicatorColor,
+        bottomBarIndicatorColor: bottomBarIndicatorColor,
+        bottomBarIndicatorHeight: bottomBarIndicatorHeight,
         boxShadows: boxShadows,
         backgroundGradient: backgroundGradient,
         mainButton: mainButton,
@@ -202,7 +206,6 @@ extension ExtensionSnackbar on GetInterface {
         userInputForm: userInputForm);
 
     final controller = SnackbarController(getSnackBar);
-
     if (instantInit) {
       controller.show(context);
     } else {

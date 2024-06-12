@@ -3,19 +3,19 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:snack_bar/get_utils/get_utils.dart';
+import 'package:get_snack_bar/get_utils/get_utils.dart';
 
-import '../../../get.dart';
+import '../../../get_snack_bar.dart';
 
 class SnackbarController {
   static final _snackBarQueue = _SnackBarQueue();
   static bool get isSnackbarBeingShown => _snackBarQueue._isJobInProgress;
-  final key = GlobalKey<GetSnackBarState>();
+  final key = GlobalKey<SSSnackBarState>();
 
   late Animation<double> _filterBlurAnimation;
   late Animation<Color?> _filterColorAnimation;
 
-  final GetSnackBar snackbar;
+  final SSSnackBar snackbar;
   final _transitionCompleter = Completer();
 
   late SnackbarStatusCallback? _snackbarStatus;
@@ -92,6 +92,7 @@ class SnackbarController {
     _overlayState = Overlay.of(context);
     _overlayEntries.clear();
     _overlayEntries.addAll(_createOverlayEntries(_getBodyWidget()));
+    _overlayState!.insertAll(_overlayEntries);
 
     _configureSnackBarDisplay(context);
   }
@@ -357,7 +358,7 @@ class _SnackBarQueue {
 
   Future<void> _addJob(BuildContext context, SnackbarController job) async {
     _snackbarList.add(job);
-    final data = await _queue.add(job._show);
+    final data = await _queue.add(() => job._show(context));
     _snackbarList.remove(job);
     return data;
   }

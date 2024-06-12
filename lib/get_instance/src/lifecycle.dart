@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:snack_bar/get_core/get_core.dart';
+import 'package:get_snack_bar/get_core/get_core.dart';
 
 /// The [GetLifeCycle]
 ///
