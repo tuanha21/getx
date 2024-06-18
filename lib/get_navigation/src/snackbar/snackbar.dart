@@ -304,7 +304,7 @@ class SSSnackBarState extends State<SSSnackBar> with TickerProviderStateMixin {
                           height: snapshot.data!.height,
                           width: snapshot.data!.width,
                           decoration: BoxDecoration(
-                            color: Colors.transparent,
+                            color: widget.backgroundColor,
                             borderRadius:
                                 BorderRadius.circular(widget.borderRadius),
                           ),
@@ -456,7 +456,6 @@ You need to either use message[String], or messageText[Widget] or define a userI
           ? BoxConstraints(maxWidth: widget.maxWidth!)
           : null,
       decoration: BoxDecoration(
-        color: widget.backgroundColor,
         gradient: widget.backgroundGradient,
         boxShadow: widget.boxShadows,
         borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -493,7 +492,6 @@ You need to either use message[String], or messageText[Widget] or define a userI
           ? BoxConstraints(maxWidth: widget.maxWidth!)
           : null,
       decoration: BoxDecoration(
-        color: widget.backgroundColor,
         gradient: widget.backgroundGradient,
         boxShadow: widget.boxShadows,
         borderRadius: BorderRadius.circular(widget.borderRadius),
